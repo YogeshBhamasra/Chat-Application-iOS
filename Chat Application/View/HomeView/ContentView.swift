@@ -3,19 +3,14 @@
 //  Chat Application
 //
 //  Created by Yogesh Rao on 28/05/23.
+//  Copyright © 2023 Yogesh Rao. All rights reserved.
 //
 
 import SwiftUI
 
 struct ContentView: View {
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundColor(.accentColor)
-            Text("Hello, world!")
-        }
-        .padding()
+        ConversationsView()
     }
 }
 
