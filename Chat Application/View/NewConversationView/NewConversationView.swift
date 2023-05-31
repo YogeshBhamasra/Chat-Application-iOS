@@ -19,7 +19,6 @@ struct NewConversationView: View {
             ScrollView {
                 Text(vm.errorMessage)
                 ForEach(vm.users) { user in
-                    HStack {
                         Button {
                             presentationMode.wrappedValue.dismiss()
                             didSelectNewUser(user)
@@ -27,23 +26,19 @@ struct NewConversationView: View {
                             WebImage(url: URL(string: user.profileImageUrl))
                                 .resizable()
                                 .frame(width: 50, height: 50)
-                                .scaledToFit()
+                                .scaledToFill()
                                 .clipped()
                                 .cornerRadius(50)
                                 .overlay(RoundedRectangle(cornerRadius: 50)
                                     .stroke(Color(uiColor: .label), lineWidth: 2))
                             Text(user.username)
+                                .foregroundColor(Color(uiColor: .label))
                             Spacer()
                         }
-                        .foregroundColor(Color(uiColor: .label))
-                        
-                    }
                     .padding(.horizontal)
-                    
                     Divider()
                         .padding(.vertical, 8)
                 }
-                
             }
             .navigationTitle("New Message")
             .toolbar {

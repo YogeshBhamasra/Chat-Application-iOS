@@ -15,17 +15,15 @@ struct ConversationsView: View {
     @State var navigateToChatView = false
     @State var chatUser: ChatUser?
     @ObservedObject private var vm = ConversationsViewModel()
+    private var chatViewModel = ChatViewModel(chatUser: nil)
     var body: some View {
         NavigationView {
             VStack {
                 customNavigationBar()
                 messages()
-                NavigationLink(isActive: $navigateToChatView) {
-                    ChatView(chatUser: self.chatUser)
-                } label: {
-                    Text("")
+                NavigationLink("", isActive: $navigateToChatView) {
+                    ChatView(vm: chatViewModel)
                 }
-
             }
             .overlay(alignment: .bottom, content: {
                 newMessageButton()
@@ -36,7 +34,7 @@ struct ConversationsView: View {
     }
     
     private func customNavigationBar() -> some View {
-        HStack {
+        HStack(spacing: 16) {
             WebImage(url: URL(string: vm.chatUser?.profileImageUrl ?? ""))
                 .resizable()
                 .scaledToFill()
@@ -47,7 +45,7 @@ struct ConversationsView: View {
                     .stroke(Color(uiColor: .label), lineWidth: 1))
                 .shadow(radius: 5)
             
-            VStack(alignment: .leading) {
+            VStack(alignment: .leading, spacing: 4) {
                 Text("\(vm.chatUser?.username ?? "")")
                     .font(.system(size: 24, weight: .bold))
                 HStack {
@@ -57,7 +55,7 @@ struct ConversationsView: View {
                     
                     Text("online")
                         .font(.system(size: 12))
-                        .foregroundColor(Color(uiColor: .darkGray))
+                        .foregroundColor(Color(uiColor: .lightGray))
                 }
             }
             Spacer()
@@ -71,7 +69,7 @@ struct ConversationsView: View {
         }
         .padding()
         .actionSheet(isPresented: $showLogOutOptions) {
-            .init(title: Text("Settings"), message: Text("What doo you want to do?"), buttons: [
+            .init(title: Text("Settings"), message: Text("What do you want to do?"), buttons: [
                 .destructive(Text("Sign Out"), action: {
                     vm.handleSignOut()
                 }),
@@ -88,17 +86,15 @@ struct ConversationsView: View {
     private func messages() -> some View {
         ScrollView {
             ForEach(vm.recentMessages) { recentMessage in
-                NavigationLink {
-                    ChatView(chatUser: ChatUser(uid: recentMessage.toId, email: recentMessage.email, profileImageUrl: recentMessage.profileImageUrl))
+                VStack {
+                Button {
+                    let uid = FirebaseManager.shared.auth.currentUser?.uid == recentMessage.fromId ? recentMessage.toId : recentMessage.fromId
+                    self.chatUser = .init(id: uid, uid: uid, email: recentMessage.email, profileImageUrl: recentMessage.profileImageUrl)
+                    self.chatViewModel.chatUser = self.chatUser
+                    self.chatViewModel.fetchMessages()
+                    self.navigateToChatView.toggle()
                 } label: {
                     HStack(spacing: 16) {
-                        if recentMessage.profileImageUrl == "" {
-                            Image(systemName: "person.fill")
-                                .font(.system(size: 32))
-                                .padding(8)
-                                .overlay(RoundedRectangle(cornerRadius: 44)
-                                    .stroke(Color(uiColor: .label), lineWidth: 1))
-                        } else {
                             WebImage(url: URL(string: recentMessage.profileImageUrl))
                                 .resizable()
                                 .scaledToFill()
@@ -108,12 +104,12 @@ struct ConversationsView: View {
                                 .overlay(RoundedRectangle(cornerRadius: 44)
                                     .stroke(Color(uiColor: .label), lineWidth: 1))
                                 .shadow(radius: 5)
-                        }
                         
                         VStack(alignment: .leading, spacing: 8) {
                             Text(recentMessage.username)
                                 .font(.system(size: 16, weight: .bold))
                                 .foregroundColor(Color(uiColor: .label))
+                                .multilineTextAlignment(.leading)
                             Text(recentMessage.text)
                                 .font(.system(size: 14))
                                 .foregroundColor(Color(uiColor: .lightGray))
@@ -132,6 +128,7 @@ struct ConversationsView: View {
             .padding(.horizontal)
         }
         .padding(.bottom, 50)
+    }
     }
     private func newMessageButton() -> some View {
         Button {
@@ -155,6 +152,8 @@ struct ConversationsView: View {
                 debugPrint(user.email)
                 self.navigateToChatView.toggle()
                 self.chatUser = user
+                self.chatViewModel.chatUser = user
+                self.chatViewModel.fetchMessages()
             })
         }
     }

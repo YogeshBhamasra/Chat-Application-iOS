@@ -15,6 +15,8 @@ class ConversationsViewModel: ObservableObject {
     @Published var errorMessage = ""
     @Published var chatUser: ChatUser?
     @Published var recentMessages = [RecentMessages]()
+    @Published var firestoreListener: ListenerRegistration?
+    
     init() {
         DispatchQueue.main.async {
             self.isUserLoggedOut = FirebaseManager.shared.auth.currentUser?.uid == nil
@@ -28,7 +30,7 @@ class ConversationsViewModel: ObservableObject {
             self.errorMessage = "Could not find firebase uid"
             return
         }
-        self.errorMessage = uid
+        
         FirebaseManager.shared.firestore
             .collection(Collections.userCollection.value)
             .document(uid).getDocument { [weak self] snapshot, error in
@@ -37,9 +39,7 @@ class ConversationsViewModel: ObservableObject {
                     return
                 }
                 do {
-                    
-                    let user = try snapshot?.data(as: ChatUser.self)
-                    self?.chatUser = user
+                    self?.chatUser = try snapshot?.data(as: ChatUser.self)
                     FirebaseManager.shared.currentUser = self?.chatUser
                 } catch {
                     self?.errorMessage = "Failed to decode: \(error.localizedDescription)"
@@ -56,8 +56,9 @@ class ConversationsViewModel: ObservableObject {
             self.errorMessage = "Could not find user id"
             return
         }
+        firestoreListener?.remove()
         self.recentMessages.removeAll()
-        FirebaseManager.shared.firestore
+        firestoreListener = FirebaseManager.shared.firestore
             .collection(Collections.recentMessages.value)
             .document(uid)
             .collection(Collections.userMessages.value)

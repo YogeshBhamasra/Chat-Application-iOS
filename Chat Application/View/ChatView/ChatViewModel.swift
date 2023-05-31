@@ -15,16 +15,17 @@ class ChatViewModel: ObservableObject {
     @Published var count = 0
     @Published var image: UIImage?
     @Published var chatMessages = [ChatMessage]()
-    let chatUser: ChatUser?
+    var chatUser: ChatUser?
     var firestoreListener: ListenerRegistration?
     init(chatUser: ChatUser?) {
         self.chatUser = chatUser
         fetchMessages()
     }
-    private func fetchMessages() {
+    func fetchMessages() {
         guard let fromId = FirebaseManager.shared.auth.currentUser?.uid,
               let toId = chatUser?.uid else {return}
         firestoreListener?.remove()
+        chatMessages.removeAll()
         firestoreListener = FirebaseManager.shared.firestore
             .collection(Collections.userMessages.value)
             .document(fromId)
@@ -48,7 +49,6 @@ class ChatViewModel: ObservableObject {
             }
     }
     func sendMessage() {
-        debugPrint(chatText)
         guard let fromId = FirebaseManager.shared.auth.currentUser?.uid,
               let toId = chatUser?.uid else {return}
         let document = FirebaseManager.shared.firestore.collection(Collections.userMessages.value)
@@ -59,11 +59,14 @@ class ChatViewModel: ObservableObject {
                             MessagesData.toUser.value: toId,
                             MessagesData.chatText.value : self.chatText,
                             MessagesData.chatTimestamp.value: Timestamp()] as [String : Any]
-        document.setData(messagesData) { error in
+        document.setData(messagesData) { [weak self] error in
             if let error {
-                self.errorMessages = "Failed to get message from database: \(error)"
+                self?.errorMessages = "Failed to get message from database: \(error)"
                 return
             }
+            self?.persistRecentMessages()
+            self?.chatText = ""
+            self?.count += 1
         }
         let recipientMessageDocument = FirebaseManager.shared.firestore.collection(Collections.userMessages.value)
             .document(toId)
@@ -75,14 +78,12 @@ class ChatViewModel: ObservableObject {
                 return
             }
         }
-        self.persistRecentMessages()
-        chatText = ""
-        self.count += 1
     }
     private func persistRecentMessages() {
         guard let uid = FirebaseManager.shared.auth.currentUser?.uid,
+              let toId = self.chatUser?.uid,
               let chatUser else {return}
-        let toId = chatUser.uid
+        
         let document = FirebaseManager.shared.firestore
             .collection(Collections.recentMessages.value)
             .document(uid)
@@ -103,8 +104,7 @@ class ChatViewModel: ObservableObject {
                 return
             }
         }
-        
-        guard let currentUser = FirebaseManager.shared.currentUser else { return }
+        guard let currentUser = FirebaseManager.shared.currentUser else {return}
         let recipientRecentMessageDictionary = [
             MessagesData.chatTimestamp.value: Timestamp(),
             MessagesData.chatText.value: self.chatText,
@@ -127,25 +127,29 @@ class ChatViewModel: ObservableObject {
             }
     }
     func handleImages() {
-        var imageUrl: URL?
         guard let fromId = FirebaseManager.shared.auth.currentUser?.uid,
               let toId = chatUser?.uid else {return}
         guard let imageData = self.image?.jpegData(compressionQuality: 0.5) else {return}
         let ref = FirebaseManager.shared.storage.reference(withPath: fromId)
-        ref.putData(imageData) { metadata, error in
+        ref.putData(imageData) {[weak self] metadata, error in
             if let error {
-                self.errorMessages = "Failed to push image in Storage: \(error)"
+                self?.errorMessages = "Failed to push image in Storage: \(error)"
                 return
             }
-            ref.downloadURL { url, error in
+            ref.downloadURL {[weak self] url, error in
                 if let error {
-                    self.errorMessages = "Failed to retrieve downloadURL: \(error)"
+                    self?.errorMessages = "Failed to retrieve downloadURL: \(error)"
                     return
                 }
                 guard let url else {return}
-                imageUrl = url
+                self?.saveImage(imageUrl: url)
             }
         }
+        
+    }
+    func saveImage(imageUrl: URL?) {
+        guard let fromId = FirebaseManager.shared.auth.currentUser?.uid,
+              let toId = chatUser?.uid else {return}
         let document = FirebaseManager.shared.firestore.collection(Collections.userMessages.value)
             .document(fromId)
             .collection(toId)

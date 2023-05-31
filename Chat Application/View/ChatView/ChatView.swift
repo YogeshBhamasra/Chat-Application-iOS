@@ -10,14 +10,12 @@ import SwiftUI
 import SDWebImageSwiftUI
 
 struct ChatView: View {
-    let chatUser: ChatUser?
     let emptyScrollidentifier = "Empty"
     @State private var showImagePicker = false
     @ObservedObject var vm: ChatViewModel
 
-    init(chatUser: ChatUser?) {
-        self.chatUser = chatUser
-        self.vm = ChatViewModel(chatUser: chatUser)
+    init(vm: ChatViewModel) {
+        self.vm = vm
         //Use this if NavigationBarTitle is with Large Font
         UINavigationBar.appearance().largeTitleTextAttributes = [.foregroundColor: UIColor.label]
 
@@ -31,8 +29,10 @@ struct ChatView: View {
             chatMessages()
             Text(vm.errorMessages)
         }
-        .onDisappear(perform: vm.firestoreListener?.remove)
-        .navigationTitle(chatUser?.username ?? "")
+        .onDisappear{
+            vm.firestoreListener?.remove()
+        }
+        .navigationTitle(vm.chatUser?.username ?? "")
         .navigationBarTitleDisplayMode(.inline)
         .fullScreenCover(isPresented: $showImagePicker, onDismiss: nil) {
             ImagePicker(image: $vm.image)
@@ -46,20 +46,27 @@ struct ChatView: View {
             if message.from == FirebaseManager.shared.auth.currentUser?.uid {
                 HStack {
                     Spacer()
-                    HStack {
+                    
                         if let text = message.text  {
-                            Text(text)
-                                .foregroundColor(.white)
+                            HStack {
+                                Text(text)
+                                    .foregroundColor(.white)
+                            }
+                            .padding()
+                            .background(Color.blue)
+                            .cornerRadius(8)
                         } else if let image = message.imageURL {
-                            WebImage(url: URL(string: image))
-                                .resizable()
-                                .scaledToFill()
-                                .frame(width: 100, height: 60)
+                            if image != "" {
+                                HStack {
+                                WebImage(url: URL(string: image))
+                                    .resizable()
+                                    .scaledToFill()
+                                    .frame(width: 200, height: 100)
+                                    .cornerRadius(8)
+                            }
+                            }
                         }
-                    }
-                    .padding()
-                    .background(Color.blue)
-                    .cornerRadius(8)
+                    
                 }
             } else {
                 HStack {
@@ -83,34 +90,36 @@ struct ChatView: View {
                 }
             }
         }
+        .padding(.horizontal)
+        .padding(.top, 8)
     }
     private func chatMessages() -> some View {
-        ScrollView {
-            ScrollViewReader { proxy in
+        VStack {
+            ScrollView {
+                ScrollViewReader { proxy in
                     VStack {
                         ForEach(vm.chatMessages) { message in
-                        chatMessagesView(message: message)
-                            .padding(.horizontal)
-                            .padding(.top, 8)
+                            chatMessagesView(message: message)
+                        }
+                        HStack {
+                            Spacer()
+                        }
+                        .id(self.emptyScrollidentifier)
                     }
-                    HStack {
-                        Spacer()
-                    }
-                    .id(self.emptyScrollidentifier)
-                }
-                .onReceive(vm.$count) { _ in
-                    withAnimation(.easeOut(duration: 0.5)) {
-                        proxy.scrollTo(self.emptyScrollidentifier, anchor: .bottom)
+                    .onReceive(vm.$count) { _ in
+                        withAnimation(.easeOut(duration: 0.5)) {
+                            proxy.scrollTo(self.emptyScrollidentifier, anchor: .bottom)
+                        }
                     }
                 }
             }
+            .background(Color(.init(white: 0.95, alpha: 1)))
+            .safeAreaInset(edge: .bottom) {
+                messagesBottomBar()
+                    .background(Color(uiColor: .systemBackground).ignoresSafeArea())
+            }
+            
         }
-        .background(Color(.init(white: 0.95, alpha: 1)))
-        .safeAreaInset(edge: .bottom) {
-            messagesBottomBar()
-                .background(Color(uiColor: .systemBackground).ignoresSafeArea())
-        }
-        
     }
     private func messagesBottomBar() -> some View {
         HStack(spacing: 16) {
@@ -160,7 +169,7 @@ private struct DescriptionPlaceholder: View {
 struct ChatView_Previews: PreviewProvider {
     static var previews: some View {
         NavigationView {
-            ChatView(chatUser: ChatUser(uid: "Ts4HsIKJkhfOTbXGyx8lfyqmrZ52", email: "test@email.com", profileImageUrl: ""))
+            ChatView(vm: .init(chatUser: ChatUser(uid: "Ts4HsIKJkhfOTbXGyx8lfyqmrZ52", email: "test@email.com", profileImageUrl: "")))
         }
     }
 }
