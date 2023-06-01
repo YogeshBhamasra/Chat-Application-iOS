@@ -8,9 +8,11 @@
 
 import SwiftUI
 import SDWebImageSwiftUI
+import Nuke
 
 struct ConversationsView: View {
     @State var showLogOutOptions = false
+    @State var showDeleteOptions = false
     @State var showNewMessageScreen = false
     @State var navigateToChatView = false
     @State var chatUser: ChatUser?
@@ -44,7 +46,9 @@ struct ConversationsView: View {
                 .overlay(RoundedRectangle(cornerRadius: 44)
                     .stroke(Color(uiColor: .label), lineWidth: 1))
                 .shadow(radius: 5)
-            
+                .onAppear {
+                    SDImageCache.shared.clearMemory()
+                }
             VStack(alignment: .leading, spacing: 4) {
                 Text("\(vm.chatUser?.username ?? "")")
                     .font(.system(size: 24, weight: .bold))
@@ -88,11 +92,7 @@ struct ConversationsView: View {
             ForEach(vm.recentMessages) { recentMessage in
                 VStack {
                 Button {
-                    let uid = FirebaseManager.shared.auth.currentUser?.uid == recentMessage.fromId ? recentMessage.toId : recentMessage.fromId
-                    self.chatUser = .init(id: uid, uid: uid, email: recentMessage.email, profileImageUrl: recentMessage.profileImageUrl)
-                    self.chatViewModel.chatUser = self.chatUser
-                    self.chatViewModel.fetchMessages()
-                    self.navigateToChatView.toggle()
+                    
                 } label: {
                     HStack(spacing: 16) {
                             WebImage(url: URL(string: recentMessage.profileImageUrl))
@@ -120,12 +120,34 @@ struct ConversationsView: View {
                             .font(.system(size: 14, weight: .semibold))
                             .foregroundColor(Color(uiColor: .label))
                     }
+                        .onTapGesture {
+                            let uid = FirebaseManager.shared.auth.currentUser?.uid == recentMessage.fromId ? recentMessage.toId : recentMessage.fromId
+                            self.chatUser = .init(id: uid, uid: uid, email: recentMessage.email, profileImageUrl: recentMessage.profileImageUrl)
+                            self.chatViewModel.chatUser = self.chatUser
+                            self.chatViewModel.fetchMessages()
+                            self.navigateToChatView.toggle()
+                        }
+                        .onLongPressGesture {
+                            showDeleteOptions.toggle()
+                            debugPrint("Another tapp")
+                        }
+                        .confirmationDialog("Delete Chat", isPresented: $showDeleteOptions) {
+                            Button(role: .destructive) {
+                                withAnimation {
+                                    debugPrint(recentMessage)
+                                }
+                            } label: {
+                                Text("Delete")
+                            }
+
+                            
+                        }
                 }
                 Divider()
                     .padding(.vertical,8)
-                
             }
             .padding(.horizontal)
+                
         }
         .padding(.bottom, 50)
     }

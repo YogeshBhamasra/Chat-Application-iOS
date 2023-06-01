@@ -70,21 +70,25 @@ struct ChatView: View {
                 }
             } else {
                 HStack {
-                    HStack {
-                        if let text = message.text  {
+                    if let text = message.text  {
+                        HStack {
                             Text(text)
-                                .foregroundColor(Color.black)
-                        } else if let image = message.imageURL {
+                                .foregroundColor(.black)
+                        }
+                        .padding()
+                        .background(Color.white)
+                        .cornerRadius(8)
+                    } else if let image = message.imageURL {
+                        if image != "" {
+                            HStack {
                             WebImage(url: URL(string: image))
                                 .resizable()
                                 .scaledToFill()
-                                .frame(width: 100, height: 60)
-                            
+                                .frame(width: 200, height: 100)
+                                .cornerRadius(8)
+                        }
                         }
                     }
-                    .padding()
-                    .background(Color.white)
-                    .cornerRadius(8)
                     
                     Spacer()
                 }

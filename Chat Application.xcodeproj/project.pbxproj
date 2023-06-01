@@ -17,23 +17,21 @@
 		6F4F36B62A24B7EE005BB4E3 /* ConversationsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F4F36B52A24B7EE005BB4E3 /* ConversationsViewModel.swift */; };
 		6F4F36B92A24B8F5005BB4E3 /* FirebaseCollections.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F4F36B82A24B8F5005BB4E3 /* FirebaseCollections.swift */; };
 		6F4F36BD2A24BD9F005BB4E3 /* ChatUser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F4F36BC2A24BD9F005BB4E3 /* ChatUser.swift */; };
-		6F4F36C02A24C0B7005BB4E3 /* SDWebImageSwiftUI in Frameworks */ = {isa = PBXBuildFile; productRef = 6F4F36BF2A24C0B7005BB4E3 /* SDWebImageSwiftUI */; };
 		6F4F36C22A24DA1E005BB4E3 /* NewConversationViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F4F36C12A24DA1E005BB4E3 /* NewConversationViewModel.swift */; };
 		6F650EC32A25C2EC0004E4A8 /* ChatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F650EC22A25C2EC0004E4A8 /* ChatView.swift */; };
 		6F650EC52A25D7570004E4A8 /* ChatViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F650EC42A25D7570004E4A8 /* ChatViewModel.swift */; };
 		6F650EC72A25E19A0004E4A8 /* ChatMessages.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F650EC62A25E19A0004E4A8 /* ChatMessages.swift */; };
 		6F650EC92A2603A20004E4A8 /* RecentMessages.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F650EC82A2603A20004E4A8 /* RecentMessages.swift */; };
-		6F650ECC2A2614970004E4A8 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 6F650ECB2A2614970004E4A8 /* FirebaseAuth */; };
-		6F650ECE2A2614970004E4A8 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 6F650ECD2A2614970004E4A8 /* FirebaseFirestore */; };
-		6F650ED02A2614970004E4A8 /* FirebaseFirestoreSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 6F650ECF2A2614970004E4A8 /* FirebaseFirestoreSwift */; };
-		6F650ED22A2614970004E4A8 /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = 6F650ED12A2614970004E4A8 /* FirebaseStorage */; };
 		6F9715AB2A231D1F0079248C /* Chat_ApplicationApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F9715AA2A231D1F0079248C /* Chat_ApplicationApp.swift */; };
 		6F9715AD2A231D1F0079248C /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F9715AC2A231D1F0079248C /* ContentView.swift */; };
 		6F9715AF2A231D200079248C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6F9715AE2A231D200079248C /* Assets.xcassets */; };
 		6F9715B22A231D200079248C /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6F9715B12A231D200079248C /* Preview Assets.xcassets */; };
+		E3B32A960B8946875AA4C949 /* Pods_Chat_Application.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 13A105D8D96290AC64EC5E72 /* Pods_Chat_Application.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		13A105D8D96290AC64EC5E72 /* Pods_Chat_Application.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Chat_Application.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		57B1DC7A6201EDC7C6BD8BDD /* Pods-Chat Application.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Chat Application.debug.xcconfig"; path = "Target Support Files/Pods-Chat Application/Pods-Chat Application.debug.xcconfig"; sourceTree = "<group>"; };
 		6F2803922A246E120098894F /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		6F2803942A246EFF0098894F /* Chat-Application-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = "Chat-Application-Info.plist"; path = "Chat Application/Resources/Chat-Application-Info.plist"; sourceTree = SOURCE_ROOT; };
 		6F28039E2A2470AC0098894F /* NewConversationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewConversationView.swift; sourceTree = "<group>"; };
@@ -55,6 +53,7 @@
 		6F9715AC2A231D1F0079248C /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		6F9715AE2A231D200079248C /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		6F9715B12A231D200079248C /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		E92D090F556206ED6BF98BF5 /* Pods-Chat Application.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Chat Application.release.xcconfig"; path = "Target Support Files/Pods-Chat Application/Pods-Chat Application.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -62,11 +61,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				6F4F36C02A24C0B7005BB4E3 /* SDWebImageSwiftUI in Frameworks */,
-				6F650ECC2A2614970004E4A8 /* FirebaseAuth in Frameworks */,
-				6F650ECE2A2614970004E4A8 /* FirebaseFirestore in Frameworks */,
-				6F650ED22A2614970004E4A8 /* FirebaseStorage in Frameworks */,
-				6F650ED02A2614970004E4A8 /* FirebaseFirestoreSwift in Frameworks */,
+				E3B32A960B8946875AA4C949 /* Pods_Chat_Application.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -210,6 +205,8 @@
 			children = (
 				6F9715A92A231D1F0079248C /* Chat Application */,
 				6F9715A82A231D1F0079248C /* Products */,
+				E272A70D74C7146F022C28D1 /* Pods */,
+				8AC9A06828EEADE8F0D1E392 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -244,6 +241,23 @@
 			path = "Preview Content";
 			sourceTree = "<group>";
 		};
+		8AC9A06828EEADE8F0D1E392 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				13A105D8D96290AC64EC5E72 /* Pods_Chat_Application.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		E272A70D74C7146F022C28D1 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				57B1DC7A6201EDC7C6BD8BDD /* Pods-Chat Application.debug.xcconfig */,
+				E92D090F556206ED6BF98BF5 /* Pods-Chat Application.release.xcconfig */,
+			);
+			path = Pods;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -251,22 +265,17 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 6F9715B52A231D200079248C /* Build configuration list for PBXNativeTarget "Chat Application" */;
 			buildPhases = (
+				BCB19F5E3602E2F45944639B /* [CP] Check Pods Manifest.lock */,
 				6F9715A32A231D1F0079248C /* Sources */,
 				6F9715A42A231D1F0079248C /* Frameworks */,
 				6F9715A52A231D1F0079248C /* Resources */,
+				C027B23369593C300D33EFA6 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 			);
 			name = "Chat Application";
-			packageProductDependencies = (
-				6F4F36BF2A24C0B7005BB4E3 /* SDWebImageSwiftUI */,
-				6F650ECB2A2614970004E4A8 /* FirebaseAuth */,
-				6F650ECD2A2614970004E4A8 /* FirebaseFirestore */,
-				6F650ECF2A2614970004E4A8 /* FirebaseFirestoreSwift */,
-				6F650ED12A2614970004E4A8 /* FirebaseStorage */,
-			);
 			productName = "Chat Application";
 			productReference = 6F9715A72A231D1F0079248C /* Chat Application.app */;
 			productType = "com.apple.product-type.application";
@@ -296,10 +305,6 @@
 				Base,
 			);
 			mainGroup = 6F97159E2A231D1F0079248C;
-			packageReferences = (
-				6F4F36BE2A24C0B7005BB4E3 /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */,
-				6F650ECA2A2614970004E4A8 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
-			);
 			productRefGroup = 6F9715A82A231D1F0079248C /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -322,6 +327,48 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		BCB19F5E3602E2F45944639B /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-Chat Application-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		C027B23369593C300D33EFA6 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-Chat Application/Pods-Chat Application-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-Chat Application/Pods-Chat Application-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Chat Application/Pods-Chat Application-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		6F9715A32A231D1F0079248C /* Sources */ = {
@@ -476,13 +523,14 @@
 		};
 		6F9715B62A231D200079248C /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 57B1DC7A6201EDC7C6BD8BDD /* Pods-Chat Application.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"Chat Application/Preview Content\"";
-				DEVELOPMENT_TEAM = X5FZ62RK6S;
+				DEVELOPMENT_TEAM = 233M37R7LR;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Chat Application/Resources/Chat-Application-Info.plist";
@@ -504,13 +552,14 @@
 		};
 		6F9715B72A231D200079248C /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = E92D090F556206ED6BF98BF5 /* Pods-Chat Application.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"Chat Application/Preview Content\"";
-				DEVELOPMENT_TEAM = X5FZ62RK6S;
+				DEVELOPMENT_TEAM = 233M37R7LR;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Chat Application/Resources/Chat-Application-Info.plist";
@@ -552,53 +601,6 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
-
-/* Begin XCRemoteSwiftPackageReference section */
-		6F4F36BE2A24C0B7005BB4E3 /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/SDWebImage/SDWebImageSwiftUI.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 2.0.0;
-			};
-		};
-		6F650ECA2A2614970004E4A8 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/firebase/firebase-ios-sdk.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 10.0.0;
-			};
-		};
-/* End XCRemoteSwiftPackageReference section */
-
-/* Begin XCSwiftPackageProductDependency section */
-		6F4F36BF2A24C0B7005BB4E3 /* SDWebImageSwiftUI */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 6F4F36BE2A24C0B7005BB4E3 /* XCRemoteSwiftPackageReference "SDWebImageSwiftUI" */;
-			productName = SDWebImageSwiftUI;
-		};
-		6F650ECB2A2614970004E4A8 /* FirebaseAuth */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 6F650ECA2A2614970004E4A8 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
-			productName = FirebaseAuth;
-		};
-		6F650ECD2A2614970004E4A8 /* FirebaseFirestore */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 6F650ECA2A2614970004E4A8 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
-			productName = FirebaseFirestore;
-		};
-		6F650ECF2A2614970004E4A8 /* FirebaseFirestoreSwift */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 6F650ECA2A2614970004E4A8 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
-			productName = FirebaseFirestoreSwift;
-		};
-		6F650ED12A2614970004E4A8 /* FirebaseStorage */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 6F650ECA2A2614970004E4A8 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
-			productName = FirebaseStorage;
-		};
-/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 6F97159F2A231D1F0079248C /* Project object */;
 }

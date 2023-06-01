@@ -4,6 +4,15 @@
 target 'Chat Application' do
   # Comment the next line if you don't want to use dynamic frameworks
   use_frameworks!
+  pod 'Nuke'
+  pod 'SDWebImage'
+  pod 'SDWebImageSwiftUI'
+  pod 'Firebase'
+  pod 'FirebaseCore'
+  pod 'FirebaseAuth'
+  pod 'FirebaseStorage'
+  pod 'FirebaseFirestore'
+  pod 'FirebaseFirestoreSwift'
 
   # Pods for Chat Application
 
