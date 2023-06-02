@@ -20,6 +20,7 @@ class FirebaseManager: NSObject {
         self.auth = Auth.auth()
         self.storage = Storage.storage()
         self.firestore = Firestore.firestore()
+        self.firestore.settings.cacheSettings = PersistentCacheSettings()
         super.init()
     }
 }

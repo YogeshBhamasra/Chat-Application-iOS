@@ -13,6 +13,7 @@ target 'Chat Application' do
   pod 'FirebaseStorage'
   pod 'FirebaseFirestore'
   pod 'FirebaseFirestoreSwift'
+  pod 'RealmSwift'
 
   # Pods for Chat Application
 

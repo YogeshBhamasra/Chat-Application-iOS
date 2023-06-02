@@ -16,6 +16,7 @@ class ConversationsViewModel: ObservableObject {
     @Published var chatUser: ChatUser?
     @Published var recentMessages = [RecentMessages]()
     @Published var firestoreListener: ListenerRegistration?
+    @Published var profileImage: UIImage?
     
     init() {
         DispatchQueue.main.async {
@@ -24,7 +25,20 @@ class ConversationsViewModel: ObservableObject {
         fetchCurrentUser()
         fetchRecentMessages()
     }
-    
+    func downloadImage(url: String) {
+        ImageManager.shared.downloadImage(urlString: url) {[weak self] result in
+            switch result {
+            case .success(let success):
+                DispatchQueue.main.async {
+                    self?.profileImage = success
+                }
+            case .failure(let failure):
+                debugPrint(failure)
+            }
+        }
+        let image = ImageManager.shared.images.getImage(key: url)
+        debugPrint(image)
+    }
     func fetchCurrentUser() {
         guard let uid = FirebaseManager.shared.auth.currentUser?.uid else {
             self.errorMessage = "Could not find firebase uid"
@@ -41,11 +55,33 @@ class ConversationsViewModel: ObservableObject {
                 do {
                     self?.chatUser = try snapshot?.data(as: ChatUser.self)
                     FirebaseManager.shared.currentUser = self?.chatUser
+                    self?.downloadImage(url: self?.chatUser?.profileImageUrl ?? "")
                 } catch {
                     self?.errorMessage = "Failed to decode: \(error.localizedDescription)"
                 }
             }
         fetchRecentMessages()
+    }
+    func checkUser() {
+        guard let uid = FirebaseManager.shared.auth.currentUser?.uid else {
+            handleSignOut()
+            return
+        }
+        FirebaseManager.shared.firestore.collection(Collections.userCollection.value)
+            .getDocuments { [weak self] documentsSnapshot, error in
+                if let error {
+                    self?.errorMessage = "Failed to fetch users: \(error)"
+                    debugPrint("Failed to fetch users: \(error)")
+                    return
+                }
+                if let bool = documentsSnapshot?.documents.first(where: { snapshot in
+                    snapshot.documentID == uid
+                }) {
+                    return
+                } else {
+                    self?.handleSignOut()
+                }
+            }
     }
     func handleSignOut() {
         isUserLoggedOut.toggle()
@@ -84,5 +120,30 @@ class ConversationsViewModel: ObservableObject {
                     }
                 })
             }
+    }
+    func deleteChat(message: RecentMessages) {
+        guard let uid = FirebaseManager.shared.currentUser?.uid else {return}
+        let fromId = message.fromId == uid ? message.toId : message.fromId
+        debugPrint(fromId)
+        debugPrint(uid)
+        let recentDocRef = FirebaseManager.shared.firestore
+            .collection(Collections.recentMessages.value)
+            .document(uid)
+            .collection(Collections.userMessages.value)
+            .document(fromId)
+        let chatMsgRef = FirebaseManager.shared.firestore
+            .collection(Collections.userMessages.value)
+            .document(uid)
+            .collection(fromId)
+        recentDocRef.getDocument { [weak self] doc, error in
+            doc?.reference.delete()
+            
+            self?.fetchRecentMessages()
+        }
+        chatMsgRef.getDocuments { snapshot, error in
+            snapshot?.documents.forEach({ doc in
+                doc.reference.delete()
+            })
+        }
     }
 }

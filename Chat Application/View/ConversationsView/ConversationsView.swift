@@ -36,19 +36,32 @@ struct ConversationsView: View {
     }
     
     private func customNavigationBar() -> some View {
-        HStack(spacing: 16) {
-            WebImage(url: URL(string: vm.chatUser?.profileImageUrl ?? ""))
-                .resizable()
-                .scaledToFill()
-                .frame(width: 50, height: 50)
-                .clipped()
-                .cornerRadius(50)
-                .overlay(RoundedRectangle(cornerRadius: 44)
-                    .stroke(Color(uiColor: .label), lineWidth: 1))
-                .shadow(radius: 5)
-                .onAppear {
-                    SDImageCache.shared.clearMemory()
-                }
+        return HStack(spacing: 16) {
+//            vm.downloadProfileImage(url: vm.chatUser?.profileImageUrl ?? "")
+            if let image = ImageManager.shared.images.getImage(key: vm.chatUser?.profileImageUrl ?? "") {
+                Image(uiImage: image)
+                    .resizable()
+                    .scaledToFill()
+                    .frame(width: 50, height: 50)
+                    .clipped()
+                    .cornerRadius(50)
+                    .overlay(RoundedRectangle(cornerRadius: 44)
+                        .stroke(Color(uiColor: .label), lineWidth: 1))
+                    .shadow(radius: 5)
+            } else {
+                WebImage(url: URL(string: vm.chatUser?.profileImageUrl ?? ""))
+                    .resizable()
+                    .scaledToFill()
+                    .frame(width: 50, height: 50)
+                    .clipped()
+                    .cornerRadius(50)
+                    .overlay(RoundedRectangle(cornerRadius: 44)
+                        .stroke(Color(uiColor: .label), lineWidth: 1))
+                    .shadow(radius: 5)
+                    .onAppear {
+                        SDImageCache.shared.clearMemory()
+                    }
+            }
             VStack(alignment: .leading, spacing: 4) {
                 Text("\(vm.chatUser?.username ?? "")")
                     .font(.system(size: 24, weight: .bold))
@@ -80,6 +93,9 @@ struct ConversationsView: View {
                 .cancel()
             ])
         }
+        .onAppear {
+            vm.checkUser()
+        }
         .fullScreenCover(isPresented: $vm.isUserLoggedOut) {
             LoginView(didCompleteLogin: {
                 self.vm.isUserLoggedOut = false
@@ -95,6 +111,17 @@ struct ConversationsView: View {
                     
                 } label: {
                     HStack(spacing: 16) {
+                        if let image = ImageManager.shared.images.getImage(key: recentMessage.profileImageUrl) {
+                            Image(uiImage: image)
+                                .resizable()
+                                .scaledToFill()
+                                .frame(width: 64, height: 64)
+                                .clipped()
+                                .cornerRadius(64)
+                                .overlay(RoundedRectangle(cornerRadius: 44)
+                                    .stroke(Color(uiColor: .label), lineWidth: 1))
+                                .shadow(radius: 5)
+                        } else {
                             WebImage(url: URL(string: recentMessage.profileImageUrl))
                                 .resizable()
                                 .scaledToFill()
@@ -104,6 +131,7 @@ struct ConversationsView: View {
                                 .overlay(RoundedRectangle(cornerRadius: 44)
                                     .stroke(Color(uiColor: .label), lineWidth: 1))
                                 .shadow(radius: 5)
+                        }
                         
                         VStack(alignment: .leading, spacing: 8) {
                             Text(recentMessage.username)
@@ -129,12 +157,11 @@ struct ConversationsView: View {
                         }
                         .onLongPressGesture {
                             showDeleteOptions.toggle()
-                            debugPrint("Another tapp")
                         }
                         .confirmationDialog("Delete Chat", isPresented: $showDeleteOptions) {
                             Button(role: .destructive) {
                                 withAnimation {
-                                    debugPrint(recentMessage)
+                                    vm.deleteChat(message: recentMessage)
                                 }
                             } label: {
                                 Text("Delete")
@@ -147,7 +174,6 @@ struct ConversationsView: View {
                     .padding(.vertical,8)
             }
             .padding(.horizontal)
-                
         }
         .padding(.bottom, 50)
     }

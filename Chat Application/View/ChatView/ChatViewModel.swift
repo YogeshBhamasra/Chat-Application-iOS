@@ -104,6 +104,7 @@ class ChatViewModel: ObservableObject {
                 return
             }
         }
+        
         guard let currentUser = FirebaseManager.shared.currentUser else {return}
         let recipientRecentMessageDictionary = [
             MessagesData.chatTimestamp.value: Timestamp(),
@@ -125,12 +126,13 @@ class ChatViewModel: ObservableObject {
                     return
                 }
             }
+        
+        
     }
     func handleImages() {
-        guard let fromId = FirebaseManager.shared.auth.currentUser?.uid,
-              let toId = chatUser?.uid else {return}
+        guard let fromId = FirebaseManager.shared.auth.currentUser?.uid else {return}
         guard let imageData = self.image?.jpegData(compressionQuality: 0.5) else {return}
-        let ref = FirebaseManager.shared.storage.reference(withPath: fromId)
+        let ref = FirebaseManager.shared.storage.reference()
         ref.putData(imageData) {[weak self] metadata, error in
             if let error {
                 self?.errorMessages = "Failed to push image in Storage: \(error)"
