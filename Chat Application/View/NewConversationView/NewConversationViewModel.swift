@@ -9,7 +9,7 @@
 import SwiftUI
 
 class NewConversationViewModel: ObservableObject {
-    @Published var users = [ChatUser]()
+    @Published var users = [User]()
     @Published var errorMessage = ""
     @Published var images : [String: UIImage] = [:]
     init() {
@@ -29,27 +29,34 @@ class NewConversationViewModel: ObservableObject {
         let image = ImageManager.shared.images.getImage(key: url)
         debugPrint(image)
     }
+//    private func firebaseListener() {
+//        guard let uid = FirebaseManager.shared.auth.currentUser?.uid else {return}
+//        FirebaseManager.shared.firestore
+//            .collection(Collections.userConnections.value)
+//            .document(uid)
+//            .collection(Collections.userCollection.value)
+//            .getDocuments { [weak self] documentsSnapshot, error in
+//                if let error {
+//                    self?.errorMessage = "Failed to fetch users: \(error)"
+//                    debugPrint("Failed to fetch users: \(error)")
+//                    return
+//                }
+//                documentsSnapshot?.documents.forEach({ [weak self] snapshot in
+//                    let data = snapshot.data()
+//                    do {
+//                        let user = try snapshot.data(as: ChatUser.self)
+//                        if user.uid != FirebaseManager.shared.auth.currentUser?.uid {
+//                            self?.downloadImage(url: user.profileImageUrl)
+//                            self?.users.append(user)
+//                        }
+//                    } catch {
+//                        self?.errorMessage = "Failed to decode: \(error.localizedDescription)"
+//                    }
+//                })
+//            }
+//    }
     private func fetchAllUsers() {
-        FirebaseManager.shared.firestore.collection(Collections.userCollection.value)
-            .getDocuments { [weak self] documentsSnapshot, error in
-                if let error {
-                    self?.errorMessage = "Failed to fetch users: \(error)"
-                    debugPrint("Failed to fetch users: \(error)")
-                    return
-                }
-                documentsSnapshot?.documents.forEach({ [weak self] snapshot in
-                    let data = snapshot.data()
-                    do {
-                        let user = try snapshot.data(as: ChatUser.self)
-                        if user.uid != FirebaseManager.shared.auth.currentUser?.uid {
-                            self?.downloadImage(url: user.profileImageUrl)
-                            self?.users.append(user)
-                        }
-                    } catch {
-                        self?.errorMessage = "Failed to decode: \(error.localizedDescription)"
-                    }
-                })
-            }
+        self.users = RealmManager().realm.objects(User.self).toArray()
     }
 }
 

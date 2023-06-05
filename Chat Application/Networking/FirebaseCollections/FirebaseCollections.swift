@@ -12,6 +12,7 @@ enum Collections: String {
     case userCollection = "users"
     case userMessages = "messages"
     case recentMessages = "recent_messages"
+    case userConnections = "user_connections"
     var value: String {
         return self.rawValue
     }

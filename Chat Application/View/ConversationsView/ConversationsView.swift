@@ -15,7 +15,8 @@ struct ConversationsView: View {
     @State var showDeleteOptions = false
     @State var showNewMessageScreen = false
     @State var navigateToChatView = false
-    @State var chatUser: ChatUser?
+    @State var showConnectUserScreen = false
+    @State var chatUser: User?
     @ObservedObject private var vm = ConversationsViewModel()
     private var chatViewModel = ChatViewModel(chatUser: nil)
     var body: some View {
@@ -77,6 +78,13 @@ struct ConversationsView: View {
             }
             Spacer()
             Button {
+                showConnectUserScreen.toggle()
+            } label: {
+                Image(systemName: "person.badge.plus")
+                    .font(.system(size: 24, weight: .bold))
+                    .foregroundColor(Color(uiColor: .label))
+            }
+            Button {
                 showLogOutOptions.toggle()
             } label: {
                 Image(systemName: "gear")
@@ -96,6 +104,9 @@ struct ConversationsView: View {
         .onAppear {
             vm.checkUser()
         }
+        .fullScreenCover(isPresented: $showConnectUserScreen, content: {
+            AddContactsView()
+        })
         .fullScreenCover(isPresented: $vm.isUserLoggedOut) {
             LoginView(didCompleteLogin: {
                 self.vm.isUserLoggedOut = false
@@ -150,7 +161,7 @@ struct ConversationsView: View {
                     }
                         .onTapGesture {
                             let uid = FirebaseManager.shared.auth.currentUser?.uid == recentMessage.fromId ? recentMessage.toId : recentMessage.fromId
-                            self.chatUser = .init(id: uid, uid: uid, email: recentMessage.email, profileImageUrl: recentMessage.profileImageUrl)
+                            self.chatUser = .init(uid: uid, email: recentMessage.email, profileImageUrl: recentMessage.profileImageUrl)
                             self.chatViewModel.chatUser = self.chatUser
                             self.chatViewModel.fetchMessages()
                             self.navigateToChatView.toggle()

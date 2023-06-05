@@ -30,6 +30,8 @@
 		6F9715AD2A231D1F0079248C /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F9715AC2A231D1F0079248C /* ContentView.swift */; };
 		6F9715AF2A231D200079248C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6F9715AE2A231D200079248C /* Assets.xcassets */; };
 		6F9715B22A231D200079248C /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6F9715B12A231D200079248C /* Preview Assets.xcassets */; };
+		6FC289112A2DA9DA000D0194 /* AddContactsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6FC289102A2DA9DA000D0194 /* AddContactsView.swift */; };
+		6FC289132A2DA9F1000D0194 /* AddContactsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6FC289122A2DA9F1000D0194 /* AddContactsViewModel.swift */; };
 		E3B32A960B8946875AA4C949 /* Pods_Chat_Application.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 13A105D8D96290AC64EC5E72 /* Pods_Chat_Application.framework */; };
 /* End PBXBuildFile section */
 
@@ -61,6 +63,8 @@
 		6F9715AC2A231D1F0079248C /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		6F9715AE2A231D200079248C /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		6F9715B12A231D200079248C /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		6FC289102A2DA9DA000D0194 /* AddContactsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddContactsView.swift; sourceTree = "<group>"; };
+		6FC289122A2DA9F1000D0194 /* AddContactsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddContactsViewModel.swift; sourceTree = "<group>"; };
 		E92D090F556206ED6BF98BF5 /* Pods-Chat Application.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Chat Application.release.xcconfig"; path = "Target Support Files/Pods-Chat Application/Pods-Chat Application.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -79,6 +83,7 @@
 		6F2803872A246D410098894F /* View */ = {
 			isa = PBXGroup;
 			children = (
+				6FC2890F2A2DA9B5000D0194 /* AddContacts */,
 				6F650EC12A25C2DC0004E4A8 /* ChatView */,
 				6F28039A2A24704A0098894F /* NewConversationView */,
 				6F2803992A24702B0098894F /* ConversationsView */,
@@ -253,6 +258,15 @@
 			path = "Preview Content";
 			sourceTree = "<group>";
 		};
+		6FC2890F2A2DA9B5000D0194 /* AddContacts */ = {
+			isa = PBXGroup;
+			children = (
+				6FC289102A2DA9DA000D0194 /* AddContactsView.swift */,
+				6FC289122A2DA9F1000D0194 /* AddContactsViewModel.swift */,
+			);
+			path = AddContacts;
+			sourceTree = "<group>";
+		};
 		8AC9A06828EEADE8F0D1E392 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -398,11 +412,13 @@
 				6F4B12382A29FB9000597E16 /* RealmExtension.swift in Sources */,
 				6F4F36B92A24B8F5005BB4E3 /* FirebaseCollections.swift in Sources */,
 				6F2803A92A2470FC0098894F /* LoginView.swift in Sources */,
+				6FC289112A2DA9DA000D0194 /* AddContactsView.swift in Sources */,
 				6F4F36BD2A24BD9F005BB4E3 /* ChatUser.swift in Sources */,
 				6F4B123B2A29FC1E00597E16 /* ResultsExtension.swift in Sources */,
 				6F4B12342A29D71900597E16 /* ImageManager.swift in Sources */,
 				6F4F36AB2A248C07005BB4E3 /* ImagePicker.swift in Sources */,
 				6F4F36B62A24B7EE005BB4E3 /* ConversationsViewModel.swift in Sources */,
+				6FC289132A2DA9F1000D0194 /* AddContactsViewModel.swift in Sources */,
 				6F4B123D2A29FC3300597E16 /* RealmManager.swift in Sources */,
 				6F2803A12A2470C40098894F /* ConversationsView.swift in Sources */,
 				6F9715AB2A231D1F0079248C /* Chat_ApplicationApp.swift in Sources */,

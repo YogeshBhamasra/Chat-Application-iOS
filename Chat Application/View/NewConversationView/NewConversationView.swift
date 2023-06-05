@@ -10,7 +10,7 @@ import SwiftUI
 import SDWebImageSwiftUI
 
 struct NewConversationView: View {
-    let didSelectNewUser: (ChatUser) -> ()
+    let didSelectNewUser: (User) -> ()
     @Environment(\.presentationMode) var presentationMode
     @ObservedObject var vm = NewConversationViewModel()
     

@@ -31,6 +31,11 @@ struct LoginView: View {
                     } label: {
                         Text("Choose Account Mode")
                     }
+                    .onChange(of: isLoginMode, perform: { _ in
+                        loginStatusMessage = ""
+                        email = ""
+                        password = ""
+                    })
                     .pickerStyle(.segmented)
                     .padding()
 

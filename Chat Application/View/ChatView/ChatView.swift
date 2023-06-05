@@ -41,7 +41,7 @@ struct ChatView: View {
                 }
         }
     }
-    private func chatMessagesView(message: ChatMessage) -> some View {
+    private func chatMessagesView(message: Message) -> some View {
         VStack {
             if message.from == FirebaseManager.shared.auth.currentUser?.uid {
                 HStack {
@@ -171,9 +171,14 @@ private struct DescriptionPlaceholder: View {
     }
 }
 struct ChatView_Previews: PreviewProvider {
+    static func getTestUser() -> User {
+        User(uid: "Ts4HsIKJkhfOTbXGyx8lfyqmrZ52", email: "test@email.com", profileImageUrl: "")
+    }
+    
     static var previews: some View {
+        
         NavigationView {
-            ChatView(vm: .init(chatUser: ChatUser(uid: "Ts4HsIKJkhfOTbXGyx8lfyqmrZ52", email: "test@email.com", profileImageUrl: "")))
+            ChatView(vm: .init(chatUser: getTestUser()))
         }
     }
 }

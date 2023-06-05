@@ -9,8 +9,9 @@
 import Foundation
 import Firebase
 import FirebaseFirestoreSwift
+import RealmSwift
 
-struct RecentMessages: Codable, Identifiable {
+class RecentMessages: Codable, Identifiable {
     @DocumentID var id: String?
     let text, fromId, toId, email, profileImageUrl : String
     let timestamp: Date
@@ -31,5 +32,27 @@ struct RecentMessages: Codable, Identifiable {
         let formatter = RelativeDateTimeFormatter()
         formatter.unitsStyle = .abbreviated
         return formatter.localizedString(for: timestamp, relativeTo: Date())
+    }
+}
+
+class RecentMessageLocal: Object, Identifiable {
+    @Persisted(primaryKey: true) var id: String = UUID().uuidString
+    @Persisted var text : String
+    @Persisted var fromId : String
+    @Persisted var toId : String
+    @Persisted var email : String
+    @Persisted var profileImageUrl : String
+    @Persisted var timestamp: Date
+    @Persisted var username: String
+    var timeAgo: String {
+        let formatter = RelativeDateTimeFormatter()
+        formatter.unitsStyle = .abbreviated
+        return formatter.localizedString(for: timestamp, relativeTo: Date())
+    }
+    override class func primaryKey() -> String? {
+        "id"
+    }
+    override required init() {
+        super.init()
     }
 }
