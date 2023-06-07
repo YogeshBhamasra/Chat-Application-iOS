@@ -16,7 +16,7 @@ struct ConversationsView: View {
     @State var showNewMessageScreen = false
     @State var navigateToChatView = false
     @State var showConnectUserScreen = false
-    @State var chatUser: User?
+    @State var chatUser: LocalUser?
     @ObservedObject private var vm = ConversationsViewModel()
     private var chatViewModel = ChatViewModel(chatUser: nil)
     var body: some View {
@@ -38,7 +38,6 @@ struct ConversationsView: View {
     
     private func customNavigationBar() -> some View {
         return HStack(spacing: 16) {
-//            vm.downloadProfileImage(url: vm.chatUser?.profileImageUrl ?? "")
             if let image = ImageManager.shared.images.getImage(key: vm.chatUser?.profileImageUrl ?? "") {
                 Image(uiImage: image)
                     .resizable()
@@ -118,51 +117,50 @@ struct ConversationsView: View {
         ScrollView {
             ForEach(vm.recentMessages) { recentMessage in
                 VStack {
-                Button {
-                    
-                } label: {
-                    HStack(spacing: 16) {
-                        if let image = ImageManager.shared.images.getImage(key: recentMessage.profileImageUrl) {
-                            Image(uiImage: image)
-                                .resizable()
-                                .scaledToFill()
-                                .frame(width: 64, height: 64)
-                                .clipped()
-                                .cornerRadius(64)
-                                .overlay(RoundedRectangle(cornerRadius: 44)
-                                    .stroke(Color(uiColor: .label), lineWidth: 1))
-                                .shadow(radius: 5)
-                        } else {
-                            WebImage(url: URL(string: recentMessage.profileImageUrl))
-                                .resizable()
-                                .scaledToFill()
-                                .frame(width: 64, height: 64)
-                                .clipped()
-                                .cornerRadius(64)
-                                .overlay(RoundedRectangle(cornerRadius: 44)
-                                    .stroke(Color(uiColor: .label), lineWidth: 1))
-                                .shadow(radius: 5)
+                    Button {
+                        
+                    } label: {
+                        HStack(spacing: 16) {
+                            if let image = ImageManager.shared.images.getImage(key: recentMessage.profileImageUrl) {
+                                Image(uiImage: image)
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 64, height: 64)
+                                    .clipped()
+                                    .cornerRadius(64)
+                                    .overlay(RoundedRectangle(cornerRadius: 64).stroke(Color(uiColor: .label), lineWidth: 1))
+                                    .shadow(radius: 5)
+                            } else {
+                                WebImage(url: URL(string: recentMessage.profileImageUrl))
+                                    .resizable()
+                                    .scaledToFit()
+                                    .frame(width: 64, height: 64)
+                                    .clipped()
+                                    .cornerRadius(64)
+                                    .overlay(RoundedRectangle(cornerRadius: 64).stroke(Color(uiColor: .label), lineWidth: 1))
+                                    .shadow(radius: 5)
+                            }
+                            VStack(alignment: .leading, spacing: 8) {
+                                Text(recentMessage.username)
+                                    .font(.system(size: 16, weight: .bold))
+                                    .foregroundColor(Color(uiColor: .label))
+                                    .multilineTextAlignment(.leading)
+                                Text(recentMessage.text)
+                                    .font(.system(size: 14))
+                                    .foregroundColor(Color(uiColor: .lightGray))
+                                    .multilineTextAlignment(.leading)
+                            }
+                            Spacer()
+                            Text(recentMessage.timeAgo)
+                                .font(.system(size: 14, weight: .semibold))
+                                .foregroundColor(Color(uiColor: .label))
                         }
                         
-                        VStack(alignment: .leading, spacing: 8) {
-                            Text(recentMessage.username)
-                                .font(.system(size: 16, weight: .bold))
-                                .foregroundColor(Color(uiColor: .label))
-                                .multilineTextAlignment(.leading)
-                            Text(recentMessage.text)
-                                .font(.system(size: 14))
-                                .foregroundColor(Color(uiColor: .lightGray))
-                                .multilineTextAlignment(.leading)
-                        }
-                        Spacer()
-                        Text(recentMessage.timeAgo)
-                            .font(.system(size: 14, weight: .semibold))
-                            .foregroundColor(Color(uiColor: .label))
-                    }
                         .onTapGesture {
                             let uid = FirebaseManager.shared.auth.currentUser?.uid == recentMessage.fromId ? recentMessage.toId : recentMessage.fromId
                             self.chatUser = .init(uid: uid, email: recentMessage.email, profileImageUrl: recentMessage.profileImageUrl)
                             self.chatViewModel.chatUser = self.chatUser
+                            self.chatViewModel.firebaseObserver()
                             self.chatViewModel.fetchMessages()
                             self.navigateToChatView.toggle()
                         }
@@ -171,23 +169,21 @@ struct ConversationsView: View {
                         }
                         .confirmationDialog("Delete Chat", isPresented: $showDeleteOptions) {
                             Button(role: .destructive) {
-                                withAnimation {
-                                    vm.deleteChat(message: recentMessage)
-                                }
+                                vm.deleteChat(message: recentMessage)
                             } label: {
                                 Text("Delete")
                             }
-
                             
                         }
-                }
+                    }
+                    }
                 Divider()
-                    .padding(.vertical,8)
+                    .padding(.vertical, 8)
             }
+            .onDelete(perform: deleteChats)
             .padding(.horizontal)
         }
-        .padding(.bottom, 50)
-    }
+        .padding(.bottom,50)
     }
     private func newMessageButton() -> some View {
         Button {
@@ -216,7 +212,15 @@ struct ConversationsView: View {
             })
         }
     }
-    
+    private func deleteChats(at offsets: IndexSet) {
+        withAnimation {
+            offsets.map {
+                vm.recentMessages[$0]
+            }.forEach { message in
+                vm.deleteChat(message: message)
+            }
+        }
+    }
 }
 
 struct ConversationsView_Previews: PreviewProvider {

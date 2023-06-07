@@ -12,7 +12,8 @@ struct AddContactsView: View {
     @State var emailId = ""
     @ObservedObject var vm = AddContactsViewModel()
     @Environment(\.presentationMode) var presentationMode
-    var body: some View {
+    @FocusState private var focused: Bool
+    var body:some View {
         NavigationView {
             VStack {
                 HStack {
@@ -23,18 +24,18 @@ struct AddContactsView: View {
                         .frame(width: nil, height: 50)
                         .padding(.horizontal)
                         .overlay(RoundedRectangle(cornerRadius: 16).stroke(Color.gray))
+                        .focused($focused)
                 }
                 
                 .padding([.top, .horizontal], 20)
                 Spacer()
                 sendButton()
             }
-            
-            .overlay(alignment: .center) {
-                if emailId != "" {
-                    Text(vm.userConnected)
-                }
-            }
+            .alert(isPresented: $vm.showAlert, content: {
+                Alert(title: Text("Alert"), message: Text(vm.userConnected),dismissButton: .default(Text("OK"), action: {
+                    presentationMode.wrappedValue.dismiss()
+                }))
+            })
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button {
@@ -49,7 +50,7 @@ struct AddContactsView: View {
     func sendButton() -> some View {
         Button {
             vm.addContactToList(email: emailId)
-            presentationMode.wrappedValue.dismiss()
+            focused = false
         } label: {
             Spacer()
             Text("Add Contact".uppercased())

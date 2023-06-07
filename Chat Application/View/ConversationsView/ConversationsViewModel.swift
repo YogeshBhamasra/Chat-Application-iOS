@@ -9,20 +9,19 @@
 import SwiftUI
 import Firebase
 import FirebaseFirestoreSwift
+import RealmSwift
 
 class ConversationsViewModel: ObservableObject {
     @Published var isUserLoggedOut = false
     @Published var errorMessage = ""
     @Published var chatUser: ChatUser?
-    @Published var recentMessages = [RecentMessages]()
+    @Published var recentMessages = [RecentMessageLocal]()
     @Published var firestoreListener: ListenerRegistration?
     @Published var profileImage: UIImage?
-    
+    var notificationToken: NotificationToken?
     init() {
-        DispatchQueue.main.async {
-            self.isUserLoggedOut = FirebaseManager.shared.auth.currentUser?.uid == nil
-        }
         fetchCurrentUser()
+        firebaseObserver()
         fetchRecentMessages()
     }
     func downloadImage(url: String) {
@@ -36,10 +35,11 @@ class ConversationsViewModel: ObservableObject {
                 debugPrint(failure)
             }
         }
-        let image = ImageManager.shared.images.getImage(key: url)
-        debugPrint(image)
     }
     func fetchCurrentUser() {
+        DispatchQueue.main.async {
+            self.isUserLoggedOut = FirebaseManager.shared.auth.currentUser?.uid == nil
+        }
         guard let uid = FirebaseManager.shared.auth.currentUser?.uid else {
             self.errorMessage = "Could not find firebase uid"
             return
@@ -74,9 +74,9 @@ class ConversationsViewModel: ObservableObject {
                     debugPrint("Failed to fetch users: \(error)")
                     return
                 }
-                if let bool = documentsSnapshot?.documents.first(where: { snapshot in
+                if documentsSnapshot?.documents.first(where: { snapshot in
                     snapshot.documentID == uid
-                }) {
+                }) != nil {
                     return
                 } else {
                     self?.handleSignOut()
@@ -87,7 +87,7 @@ class ConversationsViewModel: ObservableObject {
         isUserLoggedOut.toggle()
         try? FirebaseManager.shared.auth.signOut()
     }
-    private func fetchRecentMessages() {
+    func firebaseObserver() {
         guard let uid = FirebaseManager.shared.auth.currentUser?.uid else {
             self.errorMessage = "Could not find user id"
             return
@@ -105,45 +105,50 @@ class ConversationsViewModel: ObservableObject {
                     return
                 }
                 
-                querySnapshot?.documentChanges.forEach({ change in
-                    let id = change.document.documentID
-                    if let index = self.recentMessages.firstIndex(where: { message in
-                        message.id == id
-                    }){
-                        self.recentMessages.remove(at: index)
-                    }
+                querySnapshot?.documents.forEach({ [weak self] documentSnapshot in
                     do {
-                        let message = try change.document.data(as: RecentMessages.self)
-                        self.recentMessages.insert(message, at: 0)
+                        let message = try documentSnapshot.data(as: RecentMessages.self)
+                        if let previousMessage = self?.recentMessages.first(where: { msg in
+                            msg.email == message.email
+                        }) {
+                            RealmManager()?.deleteData(object: previousMessage)
+                        }
+                            let recentMessage = RecentMessageLocal(message: message)
+                            RealmManager()?.addData(object: recentMessage)
+                        documentSnapshot.reference.delete()
                     } catch {
-                        self.errorMessage = "Failed to decode: \(error.localizedDescription)"
+                        self?.errorMessage = "Failed to decode: \(error.localizedDescription)"
                     }
                 })
             }
     }
-    func deleteChat(message: RecentMessages) {
-        guard let uid = FirebaseManager.shared.currentUser?.uid else {return}
-        let fromId = message.fromId == uid ? message.toId : message.fromId
-        debugPrint(fromId)
-        debugPrint(uid)
-        let recentDocRef = FirebaseManager.shared.firestore
-            .collection(Collections.recentMessages.value)
-            .document(uid)
-            .collection(Collections.userMessages.value)
-            .document(fromId)
-        let chatMsgRef = FirebaseManager.shared.firestore
-            .collection(Collections.userMessages.value)
-            .document(uid)
-            .collection(fromId)
-        recentDocRef.getDocument { [weak self] doc, error in
-            doc?.reference.delete()
-            
-            self?.fetchRecentMessages()
+    private func fetchRecentMessages() {
+        notificationToken = nil
+        notificationToken = RealmManager()?.realm.objects(RecentMessageLocal.self).observe({ [weak self] change in
+            switch change {
+                
+            case .initial(let messages):
+                self?.recentMessages = messages.toArray()
+                self?.recentMessages.sort(by: {
+                    $0.timestamp > $1.timestamp
+                })
+            case .update(let messages, deletions: _, insertions: _, modifications: _):
+                self?.recentMessages = messages.toArray()
+            case .error(let error):
+                self?.errorMessage = error.localizedDescription
+            }
+        })
+    }
+    func deleteChat(message: RecentMessageLocal) {
+        let toId = message.toId
+        let fromId = message.fromId
+        let currentRecentMessages: [RecentMessageLocal] = RealmManager()?.realm.objects(RecentMessageLocal.self).toArray() ?? []
+        let chatMessages: [UserMessage] = RealmManager()?.realm.objects(UserMessage.self).toArray() ?? []
+        for currentRecentMessage in currentRecentMessages where currentRecentMessage == message {
+            RealmManager()?.deleteData(object: currentRecentMessage)
         }
-        chatMsgRef.getDocuments { snapshot, error in
-            snapshot?.documents.forEach({ doc in
-                doc.reference.delete()
-            })
+        for chatMessage in chatMessages where chatMessage.withUser == fromId || chatMessage.withUser == toId {
+            RealmManager()?.deleteData(object: chatMessage)
         }
     }
 }

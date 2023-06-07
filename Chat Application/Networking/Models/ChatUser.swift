@@ -22,14 +22,12 @@ class ChatUser: Codable, Identifiable {
         self.email = data[UserData.email.value] as? String ?? ""
         self.profileImageUrl = data[UserData.userProfileImage.value] as? String ?? ""
         self.id = documentId
-//        super.init()
     }
     init(id: String? = nil, uid: String, email: String, profileImageUrl: String) {
         self.id = id
         self.uid = uid
         self.email = email
         self.profileImageUrl = profileImageUrl
-//        super.init()
     }
     enum CodingKeys: String, CodingKey {
         case id
@@ -39,7 +37,7 @@ class ChatUser: Codable, Identifiable {
     }
 }
 
-class User: Object, Identifiable {
+class LocalUser: Object, Identifiable {
     @Persisted(primaryKey: true) var id: String = UUID().uuidString
     @Persisted var documentId: String?
     @Persisted var uid: String

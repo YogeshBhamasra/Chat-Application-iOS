@@ -11,6 +11,7 @@ import SDWebImageSwiftUI
 
 struct ChatView: View {
     let emptyScrollidentifier = "Empty"
+    @FocusState private var focused: Bool
     @State private var showImagePicker = false
     @ObservedObject var vm: ChatViewModel
 
@@ -29,7 +30,10 @@ struct ChatView: View {
             chatMessages()
             Text(vm.errorMessages)
         }
-        .onDisappear{
+        .onAppear {
+            vm.fetchMessages()
+        }
+        .onDisappear {
             vm.firestoreListener?.remove()
         }
         .navigationTitle(vm.chatUser?.username ?? "")
@@ -46,8 +50,7 @@ struct ChatView: View {
             if message.from == FirebaseManager.shared.auth.currentUser?.uid {
                 HStack {
                     Spacer()
-                    
-                        if let text = message.text  {
+                        if let text = message.text {
                             HStack {
                                 Text(text)
                                     .foregroundColor(.white)
@@ -66,11 +69,10 @@ struct ChatView: View {
                             }
                             }
                         }
-                    
                 }
             } else {
                 HStack {
-                    if let text = message.text  {
+                    if let text = message.text {
                         HStack {
                             Text(text)
                                 .foregroundColor(.black)
@@ -89,7 +91,6 @@ struct ChatView: View {
                         }
                         }
                     }
-                    
                     Spacer()
                 }
             }
@@ -124,6 +125,9 @@ struct ChatView: View {
             }
             
         }
+        .onTapGesture {
+            focused = false
+        }
     }
     private func messagesBottomBar() -> some View {
         HStack(spacing: 16) {
@@ -139,9 +143,11 @@ struct ChatView: View {
                 DescriptionPlaceholder()
                 TextEditor(text: $vm.chatText)
                     .opacity(vm.chatText.isEmpty ? 0.5 : 1)
+                    .focused($focused)
             }
             .frame(height: 40)
             Button {
+                focused = false
                 if !vm.chatText.isEmpty {
                     vm.sendMessage()
                 }
@@ -171,8 +177,8 @@ private struct DescriptionPlaceholder: View {
     }
 }
 struct ChatView_Previews: PreviewProvider {
-    static func getTestUser() -> User {
-        User(uid: "Ts4HsIKJkhfOTbXGyx8lfyqmrZ52", email: "test@email.com", profileImageUrl: "")
+    static func getTestUser() -> LocalUser {
+        LocalUser(uid: "Ts4HsIKJkhfOTbXGyx8lfyqmrZ52", email: "test@email.com", profileImageUrl: "")
     }
     
     static var previews: some View {

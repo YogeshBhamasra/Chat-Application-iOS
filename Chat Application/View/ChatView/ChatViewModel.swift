@@ -17,10 +17,9 @@ class ChatViewModel: ObservableObject {
     @Published var count = 0
     @Published var image: UIImage?
     @Published var chatMessages = [Message]()
-    var chatUser: User?
-    let realm = RealmManager()
+    var chatUser: LocalUser?
     var firestoreListener: ListenerRegistration?
-    init(chatUser: User?) {
+    init(chatUser: LocalUser?) {
         self.chatUser = chatUser
         fetchMessages()
         firebaseObserver()
@@ -42,9 +41,8 @@ class ChatViewModel: ObservableObject {
                 }
                 querySnapshot?.documents.forEach({ documentSnapshot in
                     let data = documentSnapshot.data()
-                    let id = documentSnapshot.documentID
-                    let message = Message(data)
-                    let userMessages: [UserMessage]? = self?.realm.realm.objects(UserMessage.self).toArray()
+                    let chatMessage = Message(data)
+                    let userMessages: [UserMessage]? = RealmManager()?.realm.objects(UserMessage.self).toArray()
                     var userMessage: UserMessage?
                     for message in userMessages ?? [] where message.withUser == toId {
                         userMessage = message
@@ -52,10 +50,9 @@ class ChatViewModel: ObservableObject {
                     if userMessage == nil {
                         userMessage = UserMessage()
                         userMessage?.withUser = toId
-                        self?.realm.addData(object: userMessage ?? UserMessage())
+                        RealmManager()?.addData(object: userMessage ?? UserMessage())
                     }
-                    
-                    userMessage?.messages.append(message)
+                    RealmManager()?.appendData(object: userMessage?.messages ?? List<Message>(), newObject: chatMessage)
                     documentSnapshot.reference.delete()
                 })
                 DispatchQueue.main.async { [weak self] in
@@ -65,18 +62,32 @@ class ChatViewModel: ObservableObject {
     }
     func fetchMessages() {
         guard let toId = chatUser?.uid else {return}
-        notificationToken = realm.realm.objects(UserMessage.self).observe({ [weak self] change in
+        let userMessages: [UserMessage] = RealmManager()?.realm.objects(UserMessage.self).toArray() ?? []
+        if userMessages.isEmpty {
+            self.chatMessages = []
+        }
+        for message in userMessages where message.withUser == toId {
+            self.chatMessages = Array(message.messages)
+        }
+        notificationToken = nil
+        notificationToken = RealmManager()?.realm.objects(UserMessage.self).observe({ [weak self] change in
             switch change {
                 
             case .initial(let messages):
                 let userMessage: [UserMessage] = messages.toArray()
-                for message in userMessage {
+                for message in userMessage where message.withUser == toId {
                     self?.chatMessages = Array(message.messages)
                 }
-            case .update(let messages, deletions: let deletions, insertions: let insertions, modifications: let modifications):
+                DispatchQueue.main.async {
+                    self?.count += 1
+                }
+            case .update(let messages, deletions: _, insertions: _, modifications: _):
                 let userMessage: [UserMessage] = messages.toArray()
-                for message in userMessage {
+                for message in userMessage where message.withUser == toId {
                     self?.chatMessages = Array(message.messages)
+                }
+                DispatchQueue.main.async {
+                    self?.count += 1
                 }
             case .error(let error):
                 debugPrint(error.localizedDescription)
@@ -88,26 +99,12 @@ class ChatViewModel: ObservableObject {
     func sendMessage() {
         guard let fromId = FirebaseManager.shared.auth.currentUser?.uid,
               let toId = chatUser?.uid else {return}
-        
-//        let document = FirebaseManager.shared.firestore.collection(Collections.userMessages.value)
-//            .document(fromId)
-//            .collection(toId)
-//            .document()
         let messagesData = [MessagesData.fromUser.value: fromId,
                             MessagesData.toUser.value: toId,
                             MessagesData.chatText.value : self.chatText,
                             MessagesData.chatTimestamp.value: Timestamp()] as [String : Any]
-//        document.setData(messagesData) { [weak self] error in
-//            if let error {
-//                self?.errorMessages = "Failed to get message from database: \(error)"
-//                return
-//            }
-//            self?.persistRecentMessages()
-//            self?.chatText = ""
-//            self?.count += 1
-//        }
-        let message = Message(messagesData)
-        let userMessages: [UserMessage] = realm.realm.objects(UserMessage.self).toArray()
+        let chatMessage = Message(messagesData)
+        let userMessages: [UserMessage] = RealmManager()?.realm.objects(UserMessage.self).toArray() ?? []
         var userMessage: UserMessage?
         for message in userMessages where message.withUser == toId {
             userMessage = message
@@ -115,11 +112,13 @@ class ChatViewModel: ObservableObject {
         if userMessage == nil {
             userMessage = UserMessage()
             userMessage?.withUser = toId
-            realm.addData(object: userMessage ?? UserMessage())
+            RealmManager()?.addData(object: userMessage ?? UserMessage())
         }
         
-        userMessage?.messages.append(message)
-        
+        RealmManager()?.appendData(object: userMessage?.messages ?? List<Message>(), newObject: chatMessage)
+        self.persistRecentMessages()
+        self.chatText = ""
+        self.count += 1
         let recipientMessageDocument = FirebaseManager.shared.firestore.collection(Collections.userMessages.value)
             .document(toId)
             .collection(fromId)
@@ -178,49 +177,38 @@ class ChatViewModel: ObservableObject {
                     return
                 }
             }
-        
-        
     }
     func handleImages() {
         guard let fromId = FirebaseManager.shared.auth.currentUser?.uid else {return}
         guard let imageData = self.image?.jpegData(compressionQuality: 0.5) else {return}
-        let ref = FirebaseManager.shared.storage.reference()
-        ref.putData(imageData) {[weak self] metadata, error in
-            if let error {
-                self?.errorMessages = "Failed to push image in Storage: \(error)"
-                return
-            }
-            ref.downloadURL {[weak self] url, error in
+        let ref = FirebaseManager.shared.storage.reference(withPath: "chatImages/\(fromId)/\(UUID().uuidString)")
+        
+        ref.putData(imageData, metadata: nil) {[weak self] metadata, error in
                 if let error {
-                    self?.errorMessages = "Failed to retrieve downloadURL: \(error)"
+                    self?.errorMessages = "Failed to push image in Storage: \(error)"
                     return
                 }
-                guard let url else {return}
-                self?.saveImage(imageUrl: url)
+                ref.downloadURL {[weak self] url, error in
+                    if let error {
+                        self?.errorMessages = "Failed to retrieve downloadURL: \(error)"
+                        return
+                    }
+                    guard let url else {return}
+                    self?.saveImage(imageUrl: url)
+                }
             }
-        }
         
     }
     func saveImage(imageUrl: URL?) {
         guard let fromId = FirebaseManager.shared.auth.currentUser?.uid,
               let toId = chatUser?.uid else {return}
-//        let document = FirebaseManager.shared.firestore.collection(Collections.userMessages.value)
-//            .document(fromId)
-//            .collection(toId)
-//            .document()
         let messagesData = [MessagesData.fromUser.value: fromId,
                             MessagesData.toUser.value: toId,
                             MessagesData.imageURL.value : imageUrl?.absoluteString ?? "",
                             MessagesData.chatTimestamp.value: Timestamp()] as [String : Any]
-//        document.setData(messagesData) { error in
-//            if let error {
-//                self.errorMessages = "Failed to get message from database: \(error)"
-//                return
-//            }
-//        }
         
-        let message = Message(messagesData)
-        let userMessages: [UserMessage] = realm.realm.objects(UserMessage.self).toArray()
+        let chatMessage = Message(messagesData)
+        let userMessages: [UserMessage] = RealmManager()?.realm.objects(UserMessage.self).toArray() ?? []
         var userMessage: UserMessage?
         for message in userMessages where message.withUser == toId {
             userMessage = message
@@ -228,10 +216,10 @@ class ChatViewModel: ObservableObject {
         if userMessage == nil {
             userMessage = UserMessage()
             userMessage?.withUser = toId
-            realm.addData(object: userMessage ?? UserMessage())
+            RealmManager()?.addData(object: userMessage ?? UserMessage())
         }
         
-        userMessage?.messages.append(message)
+        RealmManager()?.appendData(object: userMessage?.messages ?? List<Message>(), newObject: chatMessage)
         
         let recipientMessageDocument = FirebaseManager.shared.firestore.collection(Collections.userMessages.value)
             .document(toId)

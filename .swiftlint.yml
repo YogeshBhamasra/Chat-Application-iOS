@@ -1,0 +1,85 @@
+#!/bin/sh
+
+#  .swiftlint.yml
+#  WffApp
+#
+#  Created by Kushal Choudhary on 17/02/22.
+#  Copyright © 2022 Himanshu Singh. All rights reserved.
+disabled_rules: # rule identifiers to exclude from running
+  - colon
+  - comma
+  - control_statement
+  - identifier_name #rule for checking variable conditions (Upper case , lower case , underscore )
+  - force_cast
+  - shorthand_operator
+  - trailing_whitespace
+  - large_tuple
+  - function_parameter_count
+  - file_length
+  - type_body_length
+  - todo
+  - comment_spacing
+  - unused_closure_parameter
+  - type_name
+cyclomatic_complexity:
+  warning: 30 # two nested ifs are acceptable
+  error: 50   # six nested ifs shows warning, 6 causes compile error
+opt_in_rules: # some rules are only opt-in
+  # - empty_count
+  # Find all the available rules by running:
+  # swiftlint rules
+included: # paths to include during linting. `--path` is ignored if present.
+  - Chat Application
+excluded: # paths to ignore during linting. Takes precedence over `included`.
+  - Carthage
+  - Pods
+  - Buy
+  - Buy/Buy
+  - AppFolder\ App/Class/*
+  - Pay
+# - AppFolder\ App/ViewController/* //Enabled for this
+analyzer_rules: # Rules run by `swiftlint analyze` (experimental)
+  - explicit_self
+# configurable rules can be customised from this configuration file
+# binary rules can set their severity level
+# force_cast: warning # implicitly
+force_cast: warning # implicitly
+type_name: warning
+force_try:
+  severity: warning # explicitly
+# rules that have both warning and error levels, can set just the warning level
+# implicitly
+line_length: 600
+# they can set both implicitly with an array
+
+# or they can set both explicitly
+file_length:
+  warning: 1500
+  error: 2000
+# naming rules can set warnings/errors for min_length and max_length
+# additionally they can set excluded names
+function_body_length:
+    warning: 300
+    error: 500
+function_parameter_count:
+    warning: 30
+    error: 50
+type_body_length:
+  - 600 # warning
+  - 1000 # error
+type_name:
+  min_length: 2 # only warning
+  max_length: # warning and error
+    warning: 40
+    error: 50
+  excluded: iPhone # excluded via string
+identifier_name:
+  min_length: # only min_length
+    error: 2 # only error
+  excluded: # excluded via string array
+    - id
+    - URL
+    - GlobalAPIKey
+reporter: "xcode" # reporter type (xcode, json, csv, checkstyle, junit, html, emoji)
+
+

@@ -55,4 +55,13 @@ class RecentMessageLocal: Object, Identifiable {
     override required init() {
         super.init()
     }
+    init(message: RecentMessages) {
+        self.text = message.text
+        self.fromId = message.fromId
+        self.toId = message.toId
+        self.email = message.email
+        self.profileImageUrl = message.profileImageUrl
+        self.timestamp = message.timestamp
+        self.username = message.username
+    }
 }

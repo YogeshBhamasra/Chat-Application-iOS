@@ -10,7 +10,7 @@ import SwiftUI
 import SDWebImageSwiftUI
 
 struct NewConversationView: View {
-    let didSelectNewUser: (User) -> ()
+    let didSelectNewUser: (LocalUser) -> Void
     @Environment(\.presentationMode) var presentationMode
     @ObservedObject var vm = NewConversationViewModel()
     

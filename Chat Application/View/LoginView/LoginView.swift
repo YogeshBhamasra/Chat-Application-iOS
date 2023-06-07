@@ -10,7 +10,7 @@ import SwiftUI
 import Firebase
 
 struct LoginView: View {
-    let didCompleteLogin: () -> ()
+    let didCompleteLogin: () -> Void
     
     @State private var isLoginMode = true
     @State private var email = ""
@@ -91,9 +91,7 @@ struct LoginView: View {
                         .foregroundColor(.red)
                 }
                 .padding()
-                }
-            
-                
+                }  
             .navigationTitle(isLoginMode ? "Log In" : "Create Account")
             .background(Color(.init(white: 0, alpha: 0.05))
                 .ignoresSafeArea())
